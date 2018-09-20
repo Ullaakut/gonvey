@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -14,21 +15,26 @@ import (
 	"gopkg.in/tylerb/graceful.v1"
 )
 
-const serverAddr = "http://0.0.0.0:4242"
-
 func main() {
 	log := logger.NewZeroLog(os.Stderr)
 	log.Info().Msg("gonvey is starting up")
 
-	// TODO: Add log level to configuration
-	zerolog.SetGlobalLevel(logger.ParseLevel("DEBUG"))
+	config, err := GetConfig()
+	if err != nil {
+		log.Fatal().Err(err).Msg("invalid configuration")
+		os.Exit(1)
+	}
+	config.Print(log)
+
+	zerolog.SetGlobalLevel(logger.ParseLevel(config.LogLevel))
 
 	sig := make(chan os.Signal)
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 
-	endpoint, err := url.Parse(serverAddr)
+	endpoint, err := url.Parse(config.Endpoint)
 	if err != nil {
-		panic(err)
+		log.Fatal().Err(err).Msg("invalid endpoint")
+		os.Exit(1)
 	}
 
 	proxy := httputil.NewSingleHostReverseProxy(endpoint)
@@ -37,7 +43,7 @@ func main() {
 		NoSignalHandling: true,
 		Timeout:          10 * time.Second,
 		Server: &http.Server{
-			Addr: ":8888",
+			Addr: fmt.Sprintf(":%d", config.ServerPort),
 			Handler: &ReverseProxy{
 				log: log,
 				p:   proxy,
@@ -48,6 +54,7 @@ func main() {
 	// Start server
 	go func() {
 		log.Fatal().Err(server.ListenAndServe()).Msg("server stopped")
+		os.Exit(1)
 	}()
 
 	log.Info().Msg("gonvey is up")
