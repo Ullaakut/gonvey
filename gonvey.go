@@ -14,7 +14,7 @@ import (
 	"gopkg.in/tylerb/graceful.v1"
 )
 
-const serverAddr = "http://0.0.0.0:4242"
+const serverAddr = "http://bloggo:4242"
 
 func main() {
 	log := logger.NewZeroLog(os.Stderr)
