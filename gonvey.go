@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -10,24 +9,19 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Ullaakut/gonvey/logger"
+	"github.com/rs/zerolog"
 	"gopkg.in/tylerb/graceful.v1"
 )
-
-// Proxy is a wrapper around httputil.ReverseProxy
-type Proxy struct {
-	p *httputil.ReverseProxy
-}
-
-func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("X-Gonvey", "Gonvey")
-	log.Println("Forwarding request to", serverAddr, "on", r.URL, "from", r.RemoteAddr)
-	p.p.ServeHTTP(w, r)
-}
 
 const serverAddr = "http://0.0.0.0:4242"
 
 func main() {
-	log.Println("gonvey starting up...")
+	log := logger.NewZeroLog(os.Stderr)
+	log.Info().Msg("gonvey is starting up")
+
+	// TODO: Add log level to configuration
+	zerolog.SetGlobalLevel(logger.ParseLevel("DEBUG"))
 
 	sig := make(chan os.Signal)
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
@@ -43,28 +37,31 @@ func main() {
 		NoSignalHandling: true,
 		Timeout:          10 * time.Second,
 		Server: &http.Server{
-			Addr:    ":8888",
-			Handler: &Proxy{proxy},
+			Addr: ":8888",
+			Handler: &ReverseProxy{
+				log: log,
+				p:   proxy,
+			},
 		},
 	}
 
 	// Start server
 	go func() {
-		log.Fatal(server.ListenAndServe())
+		log.Fatal().Err(server.ListenAndServe()).Msg("server stopped")
 	}()
 
-	log.Println("gonvey is up")
+	log.Info().Msg("gonvey is up")
 
 	// Wait for server to be stopped
 	<-sig
 	signal.Stop(sig)
 	close(sig)
 
-	log.Println("gonvey is shutting down")
+	log.Info().Msg("gonvey is shutting down")
 
 	server.Stop(10 * time.Second)
 
-	log.Println("gonvey shutdown complete")
+	log.Info().Msg("gonvey shutdown complete")
 
 	os.Exit(0)
 }
