@@ -24,7 +24,6 @@ func (g *Gonveyor) RoundTrip(request *http.Request) (*http.Response, error) {
 		g.log.Error().
 			Err(err).
 			Str("client", request.RemoteAddr).
-			Str("endpoint", fmt.Sprint(request.Host)).
 			Str("path", request.RequestURI).
 			Msg("endpoint not reachable")
 		return nil, err

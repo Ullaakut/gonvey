@@ -31,9 +31,8 @@ func splitPath(requestURI string) (string, string) {
 		return "", ""
 	}
 
-	path := strings.TrimRightFunc(requestURI, func(r rune) bool {
-		return r != '/'
-	})
+	pathIdx := strings.Index(requestURI[1:], "/")
+	path := requestURI[:pathIdx+1]
 
 	subpath := strings.TrimLeftFunc(requestURI[1:], func(r rune) bool {
 		return r != '/'
