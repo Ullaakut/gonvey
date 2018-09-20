@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"math/rand"
@@ -26,19 +27,18 @@ func loadBalance(proxies []*httputil.ReverseProxy) *httputil.ReverseProxy {
 	return proxies[rand.Intn(len(proxies))]
 }
 
-func splitPath(requestURI string) (string, string) {
-	if len(requestURI) < 1 {
-		return "", ""
+// splitPath could probably be named differently. It splits the requestURI between the path and the subpath
+// the path is the part of the URI that is used to match with a set of endpoints
+// the subpath is the other part of the URI that will be added to the endpoint
+// eg: an endpoint is bound to `/bloggo`, and a request for `/bloggo/posts` comes up, the
+// request will be forwarded to the endpoint with `/posts` as its request URI
+func splitPath(requestURI string, proxyMap map[string][]*httputil.ReverseProxy) (string, string, error) {
+	for endpoint := range proxyMap {
+		if strings.HasPrefix(requestURI, endpoint) {
+			return endpoint, strings.Replace(requestURI, endpoint, "", 1), nil
+		}
 	}
-
-	pathIdx := strings.Index(requestURI[1:], "/")
-	path := requestURI[:pathIdx+1]
-
-	subpath := strings.TrimLeftFunc(requestURI[1:], func(r rune) bool {
-		return r != '/'
-	})
-
-	return path, subpath
+	return "", "", fmt.Errorf("path %s is not bound to any endpoints", requestURI)
 }
 
 // MultiHostReverseProxy is a wrapper around httputil.ReverseProxy
@@ -76,10 +76,12 @@ func NewMultiHostReverseProxy(logger *zerolog.Logger, proxyMap map[string][]stri
 func (mhrp *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("X-Gonvey", "Gonvey")
 
-	// TODO: This only allows paths that are `/something/`, so for example you
-	// can't bind `/bloggo/api/v1/` to an endpoint and `/bloggo/api/v2` to another,
-	// as the split will just match with `/bloggo` for both
-	path, subpath := splitPath(r.RequestURI)
+	path, subpath, err := splitPath(r.RequestURI, mhrp.p)
+	if err != nil {
+		mhrp.log.Error().Str("request_uri", r.RequestURI).Msg("unknown path")
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
 
 	// Rewrite the URI to be forwarded by removing the path used for routing
 	// eg: `/bloggo/posts` becomes `/posts` redirected to an endpoint
@@ -88,13 +90,8 @@ func (mhrp *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Requ
 
 	// Pick a random endpoint for this path
 	proxy := loadBalance(mhrp.p[path])
-	if proxy == nil {
-		mhrp.log.Error().Str("path", path).Msg("unknown path")
-		w.WriteHeader(http.StatusNotFound)
-	} else {
-		proxy.Transport = &Gonveyor{
-			log: mhrp.log,
-		}
-		proxy.ServeHTTP(w, r)
+	proxy.Transport = &Gonveyor{
+		log: mhrp.log,
 	}
+	proxy.ServeHTTP(w, r)
 }
