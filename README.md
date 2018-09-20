@@ -2,6 +2,8 @@
 
 Gonvey is a simple reverse proxy.
 
+[![Build Status](https://travis-ci.org/Ullaakut/gonvey.svg?branch=master)](https://travis-ci.org/Ullaakut/gonvey)
+
 ## Dependencies
 
 ### Docker build
