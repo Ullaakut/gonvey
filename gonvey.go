@@ -3,14 +3,13 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"net/http/httputil"
-	"net/url"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
 	"github.com/Ullaakut/gonvey/logger"
+
 	"github.com/rs/zerolog"
 	"gopkg.in/tylerb/graceful.v1"
 )
@@ -31,23 +30,18 @@ func main() {
 	sig := make(chan os.Signal)
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 
-	endpoint, err := url.Parse(config.Endpoint)
+	proxy, err := NewMultiHostReverseProxy(log, config.ProxyMap)
 	if err != nil {
-		log.Fatal().Err(err).Msg("invalid endpoint")
+		log.Fatal().Err(err).Msg("invalid proxy map")
 		os.Exit(1)
 	}
-
-	proxy := httputil.NewSingleHostReverseProxy(endpoint)
 
 	server := &graceful.Server{
 		NoSignalHandling: true,
 		Timeout:          10 * time.Second,
 		Server: &http.Server{
-			Addr: fmt.Sprintf(":%d", config.ServerPort),
-			Handler: &ReverseProxy{
-				log: log,
-				p:   proxy,
-			},
+			Addr:    fmt.Sprintf(":%d", config.ServerPort),
+			Handler: proxy,
 		},
 	}
 

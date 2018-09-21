@@ -21,7 +21,11 @@ func (g *Gonveyor) RoundTrip(request *http.Request) (*http.Response, error) {
 
 	response, err := http.DefaultTransport.RoundTrip(request)
 	if err != nil {
-		g.log.Error().Err(err).Msg("server not reachable")
+		g.log.Error().
+			Err(err).
+			Str("client", request.RemoteAddr).
+			Str("path", request.RequestURI).
+			Msg("endpoint not reachable")
 		return nil, err
 	}
 	elapsed := time.Since(start)
