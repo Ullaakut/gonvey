@@ -8,7 +8,7 @@ import (
 	v "gopkg.in/go-playground/validator.v9"
 )
 
-// Config represents the Bloggo configuration
+// Config represents the Gonvey configuration
 type Config struct {
 	LogLevel   string              `json:"log_level" validate:"required,eq=DEBUG|eq=INFO|eq=WARNING|eq=ERROR|eq=FATAL"`
 	ServerPort uint                `json:"server_port" validate:"required,min=1,max=65535"`

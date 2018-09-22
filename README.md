@@ -20,7 +20,6 @@ Gonvey is a simple reverse proxy. It has a very basic load balancing that consis
     </a>
 </p>
 
-
 ## How to run it
 
 * `docker-compose up`
@@ -35,13 +34,13 @@ Sets the log level. Default value is `DEBUG`.
 
 Examples: `DEBUG`, `INFO`, `WARNING`, `ERROR`, `FATAL`.
 
-### `BLOGGO_SERVER_PORT`
+### `GONVEY_SERVER_PORT`
 
 Sets the port used by the proxy. Default value is `8888`.
 
 Can be any value between `1` and `65535`.
 
-### `BLOGGO_PROXY_MAP`
+### `GONVEY_PROXY_MAP`
 
 Sets the paths and endpoints that are bound within the proxy. For now, it's stored in a JSON-encoded string. Default value is `{"/bloggo":["http://app1:4242"],"/test":["http://app2:4243","http://app3:4244","http://app4:4245"]}`.
 
@@ -57,7 +56,6 @@ Examples:
 * `{"/api/v1":["http://app1:4242"],"/api/v2":["http://app2:4243"],"/api/v3":["http://app3:4244"],"/api/v4":["http://app4:4245"]}`
 
 ## Screenshots
-
 
 <p align="center">
     <img width="100%" src="images/logs.png">
