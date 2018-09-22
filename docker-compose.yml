@@ -1,0 +1,41 @@
+version: '3.1'
+
+services:
+
+  gonvey:
+    build: .
+    environment:
+      - GONVEY_LOG_LEVEL=DEBUG
+      - GONVEY_SERVER_PORT=8888
+    ports:
+      - 8888:8888
+
+  # The 4 endpoints are simple http servers that take a port
+  # and return 404 to everything that makes request
+  app1:
+    image: ullaakut/simplehttptest
+    ports:
+      - 4242:4242
+    environment:
+      - PORT=4242
+
+  app2:
+    image: ullaakut/simplehttptest
+    ports:
+      - 4243:4243
+    environment:
+      - PORT=4243
+
+  app3:
+    image: ullaakut/simplehttptest
+    ports:
+      - 4244:4244
+    environment:
+      - PORT=4244
+
+  app4:
+    image: ullaakut/simplehttptest
+    ports:
+      - 4245:4245
+    environment:
+      - PORT=4245
