@@ -9,6 +9,11 @@ services:
       - GONVEY_SERVER_PORT=8888
     ports:
       - 8888:8888
+    depends_on:
+      - app1
+      - app2
+      - app3
+      - app4
 
   # The 4 endpoints are simple http servers that take a port
   # and return 404 to everything that makes request
