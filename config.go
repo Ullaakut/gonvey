@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/rs/zerolog"
@@ -10,19 +11,28 @@ import (
 
 // Config represents the Bloggo configuration
 type Config struct {
-	LogLevel   string              `json:"log_level" validate:"required,eq=DEBUG|eq=INFO|eq=WARNING|eq=ERROR|eq=FATAL"`
-	ServerPort uint                `json:"server_port" validate:"required,min=1,max=65535"`
+	LogLevel   string              `json:"log_level" validate:"required,eq=DEBUG|eq=INFO|eq=WARNING|eq=ERROR|eq=FATAL" config:"log_level,watch"`
+	ServerPort uint                `json:"server_port" validate:"required,min=1,max=65535" config:"server_port"`
 	ProxyMap   map[string][]string `json:"proxy_map"`
+
+	// Contains a JSON-encoded string representing the ProxyMap. Needed for consul
+	ProxyMapStr string `config:"proxy_map,watch,restart"`
 }
 
 // Set default values for configuration parameters
 func init() {
-	viper.SetDefault("log_level", "DEBUG")
-	viper.SetDefault("server_port", 8888)
-	viper.SetDefault("proxy_map", map[string][]string{
+	defaultProxyMap := map[string][]string{
 		"/bloggo": []string{"http://0.0.0.0:4242"},
 		"/test":   []string{"http://0.0.0.0:4243", "http://0.0.0.0:4244", "http://0.0.0.0:4245"},
-	})
+	}
+
+	mapStr, _ := json.Marshal(defaultProxyMap)
+
+	viper.SetDefault("log_level", "DEBUG")
+	viper.SetDefault("server_port", 8888)
+	viper.SetDefault("proxy_map", defaultProxyMap)
+	viper.SetDefault("proxy_map_str", string(mapStr))
+	fmt.Println("Setting proxy map str to ", string(mapStr))
 }
 
 // GetConfig sets the default values for the configuration and gets it from the environment/command line
