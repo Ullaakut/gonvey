@@ -3,7 +3,7 @@
 Gonvey is a simple reverse proxy. It has a very basic load balancing that consists of randomly forwarding requests to one of the endpoints that matches the requests' path, and is configurable.
 
 <p align="center">
-    <img src="images/gonveylogo.png" width="350"/>
+    <img src="images/logo.png" width="350"/>
 </p>
 <p align="center">
     <a href="#license">
