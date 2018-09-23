@@ -2,6 +2,8 @@
 
 Gonvey is a simple reverse proxy. It has a very basic load balancing that consists of randomly forwarding requests to one of the endpoints that matches the requests' path, and is configurable. It also comes with a stack of docker containers providing metrics and metrics visualization out of the box.
 
+See the [part on proxy map configuration](#gonvey_proxy_map) for more information on how to use it to proxy to your services.
+
 <p align="center">
     <img src="images/logo.png" width="350"/>
 </p>
@@ -23,11 +25,17 @@ Gonvey is a simple reverse proxy. It has a very basic load balancing that consis
 
 ## Table of content
 
+* [Dependencies](#dependencies)
 * [How to run it](#how-to-run-it)
 * [Services](#Services)
 * [Configuration](#Configuration)
 * [Screenshots](#Screenshots)
 * [License](#license)
+
+## Dependencies
+
+* `docker` [Download](https://www.docker.com/community-edition)
+* `docker-compose` [Download](https://docs.docker.com/compose/install/)
 
 ## How to run it
 
