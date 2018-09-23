@@ -8,7 +8,7 @@ import (
 	v "gopkg.in/go-playground/validator.v9"
 )
 
-// Config represents the Bloggo configuration
+// Config represents the Gonvey configuration
 type Config struct {
 	LogLevel   string              `json:"log_level" validate:"required,eq=DEBUG|eq=INFO|eq=WARNING|eq=ERROR|eq=FATAL"`
 	ServerPort uint                `json:"server_port" validate:"required,min=1,max=65535"`
@@ -20,8 +20,8 @@ func init() {
 	viper.SetDefault("log_level", "DEBUG")
 	viper.SetDefault("server_port", 8888)
 	viper.SetDefault("proxy_map", map[string][]string{
-		"/bloggo": []string{"http://0.0.0.0:4242"},
-		"/test":   []string{"http://0.0.0.0:4243", "http://0.0.0.0:4244", "http://0.0.0.0:4245"},
+		"/bloggo": {"http://app1:4242"},
+		"/test":   {"http://app2:4243", "http://app3:4244", "http://app4:4245"},
 	})
 }
 
