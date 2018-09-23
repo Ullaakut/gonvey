@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog"
 )
 
@@ -75,6 +76,13 @@ func NewMultiHostReverseProxy(logger *zerolog.Logger, proxyMap map[string][]stri
 
 func (mhrp *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("X-Gonvey", "Gonvey")
+
+	// Prometheus handles the /metrics endpoint
+	if r.RequestURI == "/metrics" {
+		handle := promhttp.Handler()
+		handle.ServeHTTP(w, r)
+		return
+	}
 
 	path, subpath, err := splitPath(r.RequestURI, mhrp.p)
 	if err != nil {

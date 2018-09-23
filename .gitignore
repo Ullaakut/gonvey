@@ -15,3 +15,7 @@ coverage.html
 
 # dep
 /vendor
+
+# Metrics persistence
+prometheus_data
+grafana-data

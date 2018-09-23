@@ -7,7 +7,7 @@ services:
     environment:
       - GONVEY_LOG_LEVEL=DEBUG
       - GONVEY_SERVER_PORT=8888
-      - GONVEY_PROXY_MAP={"/bloggo":["http://app1:4242"]}
+      - GONVEY_PROXY_MAP={"/bloggo":["http://app1:4242"],"/test":["http://app2:4243","http://app3:4244","http://app4:4245"]}
     ports:
       - 8888:8888
     depends_on:
@@ -15,6 +15,29 @@ services:
       - app2
       - app3
       - app4
+
+  metrics:
+    image: prom/prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus-data:/prometheus
+
+  metrics-gateway:
+    image: prom/pushgateway
+    ports:
+      - 9091:9091
+
+  metrics-dashboard:
+    image: grafana/grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana-data:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    depends_on:
+      - metrics
 
   # The 4 endpoints are simple http servers that take a port
   # and return 404 to everything that makes request

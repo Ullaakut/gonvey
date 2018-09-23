@@ -1,0 +1,19 @@
+# my global config
+global:
+  scrape_interval:     15s
+  evaluation_interval: 30s
+  # scrape_timeout is set to the global default (10s).
+
+  external_labels:
+    monitor: codelab
+    foo:     bar
+
+scrape_configs:
+- job_name: self
+  scrape_interval: 5s
+  static_configs:
+  - targets: ['localhost:9090']
+- job_name: gonvey
+  scrape_interval: 5s
+  static_configs:
+  - targets: ['gonvey:8888']
