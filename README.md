@@ -20,9 +20,52 @@ Gonvey is a simple reverse proxy. It has a very basic load balancing that consis
     </a>
 </p>
 
+## Table of content
+
+* [How to run it](#how-to-run-it)
+* [Services](#Services)
+* [Configuration](#Configuration)
+* [Screenshots](#Screenshots)
+* [License](#license)
+
 ## How to run it
 
 * `docker-compose up`
+
+## Services
+
+In the `docker-compose.yml` file, other services are specified to be running alongside `Gonvey`.
+
+### Metrics
+
+The metrics service uses Prometheus to store the following metrics:
+
+* The basic `promhttp` metrics
+* `http_response_time`
+* `http_requests_count` (with labels:)
+  * `http_method`
+  * `http_request_uri`
+  * `endpoint`
+* `http_remote_addr`
+* `http_response_code`
+
+### Metrics Gateway
+
+This service is used to allow for Gonvey to push its metrics to `Metrics` using custom labels.
+
+### Metrics Dashboard
+
+This service uses Grafana to display a pre-configured dashboard that uses `Metrics` as its source.
+
+<p align="center">
+    <img width="80%" src="images/dashboard.png">
+</p>
+
+Once you ran `docker-compose up`, you can find it by visiting `localhost:3000` in your favorite browser.
+
+### Apps
+
+The `apps` (`app1`, `app2`, `app3` and `app4`) are dummy applications that are set as the default endpoints for Gonvey. They return `200 OK` on their `/posts` endpoint, and `400` on other routes.
 
 ## Configuration
 
@@ -58,7 +101,7 @@ Examples:
 ## Screenshots
 
 <p align="center">
-    <img width="100%" src="images/logs.png">
+    <img width="80%" src="images/logs.png">
 </p>
 
 ## License
