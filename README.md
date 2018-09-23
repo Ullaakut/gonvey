@@ -1,10 +1,11 @@
 # Gonvey
 
-Gonvey is a simple reverse proxy. It has a very basic load balancing that consists of randomly forwarding requests to one of the endpoints that matches the requests' path, and is configurable.
+Gonvey is a simple reverse proxy. It has a very basic load balancing that consists of randomly forwarding requests to one of the endpoints that matches the requests' path, and is configurable. It also comes with a stack of docker containers providing metrics and metrics visualization out of the box.
 
 <p align="center">
     <img src="images/logo.png" width="350"/>
 </p>
+
 <p align="center">
     <a href="#license">
         <img src="https://img.shields.io/badge/license-Apache-blue.svg?style=flat" />
@@ -71,17 +72,29 @@ The `apps` (`app1`, `app2`, `app3` and `app4`) are dummy applications that are s
 
 Gonvey is configured using the environment. The simplest way is to edit the environment variables in the `docker-compose.yml` file at the root of the repository.
 
-### GONVEY_LOG_LEVEL
+Here is an example with the default configuration values:
+
+<p align="center">
+    <img width="80%" src="images/configuration.png">
+</p>
+
+------------------------
+
+### `GONVEY_LOG_LEVEL`
 
 Sets the log level. Default value is `DEBUG`.
 
 Examples: `DEBUG`, `INFO`, `WARNING`, `ERROR`, `FATAL`.
+
+------------------------
 
 ### `GONVEY_SERVER_PORT`
 
 Sets the port used by the proxy. Default value is `8888`.
 
 Can be any value between `1` and `65535`.
+
+------------------------
 
 ### `GONVEY_PROXY_MAP`
 
@@ -97,6 +110,8 @@ Examples:
 
 * `{"/test1":["http://app1:4242"]}`
 * `{"/api/v1":["http://app1:4242"],"/api/v2":["http://app2:4243"],"/api/v3":["http://app3:4244"],"/api/v4":["http://app4:4245"]}`
+
+------------------------
 
 ## Screenshots
 
