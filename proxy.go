@@ -17,18 +17,16 @@ import (
 
 // loadBalance just randomly gets a proxy out of the slice of proxies
 // Not the smartest load balancing, but certainly the simplest
+// We assume that the list of proxies is never empty, as it would have
+// triggered a validation error in `config.go`
 func loadBalance(proxies []*httputil.ReverseProxy) *httputil.ReverseProxy {
-	if len(proxies) == 0 {
-		return nil
-	}
-
 	// set random seed
 	rand.Seed(time.Now().UnixNano())
 
 	return proxies[rand.Intn(len(proxies))]
 }
 
-// splitPath could probably be named differently. It splits the requestURI between the path and the subpath
+// splitPath splits the requestURI between the path and the subpath
 // the path is the part of the URI that is used to match with a set of endpoints
 // the subpath is the other part of the URI that will be added to the endpoint
 // eg: an endpoint is bound to `/bloggo`, and a request for `/bloggo/posts` comes up, the
@@ -55,6 +53,7 @@ func NewMultiHostReverseProxy(logger *zerolog.Logger, proxyMap map[string][]stri
 		log: logger,
 	}
 
+	// create singleHostReverseProxies for each entry in the proxy map
 	for path, endpoints := range proxyMap {
 		for _, endpoint := range endpoints {
 			url, err := url.Parse(endpoint)
@@ -84,6 +83,7 @@ func (mhrp *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	// get path and subpath from request URI to match with endpoint
 	path, subpath, err := splitPath(r.RequestURI, mhrp.p)
 	if err != nil {
 		mhrp.log.Error().Str("request_uri", r.RequestURI).Msg("unknown path")
@@ -98,6 +98,7 @@ func (mhrp *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Requ
 
 	// Pick a random endpoint for this path
 	proxy := loadBalance(mhrp.p[path])
+	// Use a Gonveyor as the Transport, in order to add metrics and logging
 	proxy.Transport = &Gonveyor{
 		log: mhrp.log,
 	}

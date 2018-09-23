@@ -1,10 +1,13 @@
 # Gonvey
 
-Gonvey is a simple reverse proxy. It has a very basic load balancing that consists of randomly forwarding requests to one of the endpoints that matches the requests' path, and is configurable.
+Gonvey is a simple reverse proxy. It has a very basic load balancing that consists of randomly forwarding requests to one of the endpoints that matches the requests' path, and is configurable. It also comes with a stack of docker containers providing metrics and metrics visualization out of the box.
+
+See the [part on proxy map configuration](#gonvey_proxy_map) for more information on how to use it to proxy to your services.
 
 <p align="center">
     <img src="images/logo.png" width="350"/>
 </p>
+
 <p align="center">
     <a href="#license">
         <img src="https://img.shields.io/badge/license-Apache-blue.svg?style=flat" />
@@ -22,11 +25,17 @@ Gonvey is a simple reverse proxy. It has a very basic load balancing that consis
 
 ## Table of content
 
+* [Dependencies](#dependencies)
 * [How to run it](#how-to-run-it)
 * [Services](#Services)
 * [Configuration](#Configuration)
 * [Screenshots](#Screenshots)
 * [License](#license)
+
+## Dependencies
+
+* `docker` [Download](https://www.docker.com/community-edition)
+* `docker-compose` [Download](https://docs.docker.com/compose/install/)
 
 ## How to run it
 
@@ -71,11 +80,21 @@ The `apps` (`app1`, `app2`, `app3` and `app4`) are dummy applications that are s
 
 Gonvey is configured using the environment. The simplest way is to edit the environment variables in the `docker-compose.yml` file at the root of the repository.
 
-### GONVEY_LOG_LEVEL
+Here is an example with the default configuration values:
+
+<p align="center">
+    <img width="80%" src="images/configuration.png">
+</p>
+
+------------------------
+
+### `GONVEY_LOG_LEVEL`
 
 Sets the log level. Default value is `DEBUG`.
 
 Examples: `DEBUG`, `INFO`, `WARNING`, `ERROR`, `FATAL`.
+
+------------------------
 
 ### `GONVEY_SERVER_PORT`
 
@@ -83,20 +102,24 @@ Sets the port used by the proxy. Default value is `8888`.
 
 Can be any value between `1` and `65535`.
 
+------------------------
+
 ### `GONVEY_PROXY_MAP`
 
-Sets the paths and endpoints that are bound within the proxy. For now, it's stored in a JSON-encoded string. Default value is `{"/bloggo":["http://app1:4242"],"/test":["http://app2:4243","http://app3:4244","http://app4:4245"]}`.
+Sets the paths and endpoints that are bound within the proxy. For now, it's stored in a JSON-encoded string. Default value is `{"/bloggo":["http://app1"],"/test":["http://app2","http://app3","http://app4"]}`.
 
 Note that paths are matched in a random order, so if a proxy map is like such for example:
 
-`{"/test/deep/bind":["http://app2:4243"],"/test":["http://app1:4242"]}`
+`{"/test/deep/bind":["http://app2"],"/test":["http://app1"]}`
 
 And a request comes in for `/test/deep/bind`, it might go to either `app1` or `app2`. (This is because maps are unordered in go)
 
 Examples:
 
-* `{"/test1":["http://app1:4242"]}`
-* `{"/api/v1":["http://app1:4242"],"/api/v2":["http://app2:4243"],"/api/v3":["http://app3:4244"],"/api/v4":["http://app4:4245"]}`
+* `{"/test":["http://app1"]}`
+* `{"/api/v1":["http://app1"],"/api/v2":["http://app2"],"/api/v3":["http://app3"],"/api/v4":["http://app4"]}`
+
+------------------------
 
 ## Screenshots
 

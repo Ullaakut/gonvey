@@ -7,7 +7,7 @@ services:
     environment:
       - GONVEY_LOG_LEVEL=DEBUG
       - GONVEY_SERVER_PORT=8888
-      - GONVEY_PROXY_MAP={"/bloggo":["http://app1:4242"],"/test":["http://app2:4243","http://app3:4244","http://app4:4245"]}
+      - GONVEY_PROXY_MAP={"/bloggo":["http://app1"],"/test":["http://app2","http://app3","http://app4"]}
     ports:
       - 8888:8888
     depends_on:
@@ -43,28 +43,20 @@ services:
   # and return 404 to everything that makes request
   app1:
     image: ullaakut/simplehttptest
-    ports:
-      - 4242:4242
     environment:
-      - PORT=4242
+      - PORT=80
 
   app2:
     image: ullaakut/simplehttptest
-    ports:
-      - 4243:4243
     environment:
-      - PORT=4243
+      - PORT=80
 
   app3:
     image: ullaakut/simplehttptest
-    ports:
-      - 4244:4244
     environment:
-      - PORT=4244
+      - PORT=80
 
   app4:
     image: ullaakut/simplehttptest
-    ports:
-      - 4245:4245
     environment:
-      - PORT=4245
+      - PORT=80

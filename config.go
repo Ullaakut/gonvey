@@ -20,8 +20,8 @@ func init() {
 	viper.SetDefault("log_level", "DEBUG")
 	viper.SetDefault("server_port", 8888)
 	viper.SetDefault("proxy_map", map[string][]string{
-		"/bloggo": {"http://app1:4242"},
-		"/test":   {"http://app2:4243", "http://app3:4244", "http://app4:4245"},
+		"/bloggo": {"http://app1"},
+		"/test":   {"http://app2", "http://app3", "http://app4"},
 	})
 }
 
