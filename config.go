@@ -51,7 +51,7 @@ func GetConfig() (Config, error) {
 func (c Config) Print(log *zerolog.Logger) {
 	log.Debug().
 		Str("log_level", c.LogLevel).
-		Str("endpoint", fmt.Sprintf("%+v", c.ProxyMap)).
+		Str("proxy_map", fmt.Sprintf("%+v", c.ProxyMap)).
 		Uint("server_port", c.ServerPort).
 		Msg("configuration")
 }
