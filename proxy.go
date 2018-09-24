@@ -15,31 +15,6 @@ import (
 	"github.com/rs/zerolog"
 )
 
-// loadBalance just randomly gets a proxy out of the slice of proxies
-// Not the smartest load balancing, but certainly the simplest
-// We assume that the list of proxies is never empty, as it would have
-// triggered a validation error in `config.go`
-func loadBalance(proxies []*httputil.ReverseProxy) *httputil.ReverseProxy {
-	// set random seed
-	rand.Seed(time.Now().UnixNano())
-
-	return proxies[rand.Intn(len(proxies))]
-}
-
-// splitPath splits the requestURI between the path and the subpath
-// the path is the part of the URI that is used to match with a set of endpoints
-// the subpath is the other part of the URI that will be added to the endpoint
-// eg: an endpoint is bound to `/bloggo`, and a request for `/bloggo/posts` comes up, the
-// request will be forwarded to the endpoint with `/posts` as its request URI
-func splitPath(requestURI string, proxyMap map[string][]*httputil.ReverseProxy) (string, string, error) {
-	for endpoint := range proxyMap {
-		if strings.HasPrefix(requestURI, endpoint) {
-			return endpoint, strings.Replace(requestURI, endpoint, "", 1), nil
-		}
-	}
-	return "", "", fmt.Errorf("path %s is not bound to any endpoints", requestURI)
-}
-
 // MultiHostReverseProxy is a wrapper around httputil.ReverseProxy
 type MultiHostReverseProxy struct {
 	log *zerolog.Logger
@@ -103,4 +78,29 @@ func (mhrp *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Requ
 		log: mhrp.log,
 	}
 	proxy.ServeHTTP(w, r)
+}
+
+// loadBalance just randomly gets a proxy out of the slice of proxies
+// Not the smartest load balancing, but certainly the simplest
+// We assume that the list of proxies is never empty, as it would have
+// triggered a validation error in `config.go`
+func loadBalance(proxies []*httputil.ReverseProxy) *httputil.ReverseProxy {
+	// set random seed
+	rand.Seed(time.Now().UnixNano())
+
+	return proxies[rand.Intn(len(proxies))]
+}
+
+// splitPath splits the requestURI between the path and the subpath
+// the path is the part of the URI that is used to match with a set of endpoints
+// the subpath is the other part of the URI that will be added to the endpoint
+// eg: an endpoint is bound to `/bloggo`, and a request for `/bloggo/posts` comes up, the
+// request will be forwarded to the endpoint with `/posts` as its request URI
+func splitPath(requestURI string, proxyMap map[string][]*httputil.ReverseProxy) (string, string, error) {
+	for endpoint := range proxyMap {
+		if strings.HasPrefix(requestURI, endpoint) {
+			return endpoint, strings.Replace(requestURI, endpoint, "", 1), nil
+		}
+	}
+	return "", "", fmt.Errorf("path %s is not bound to any endpoints", requestURI)
 }
