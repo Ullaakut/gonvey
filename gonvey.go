@@ -25,7 +25,7 @@ func main() {
 
 	zerolog.SetGlobalLevel(ParseLevel(config.LogLevel))
 
-	sig := make(chan os.Signal)
+	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 
 	proxy, err := NewMultiHostReverseProxy(log, config.ProxyMap)

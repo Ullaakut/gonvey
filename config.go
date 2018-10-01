@@ -32,14 +32,17 @@ func GetConfig() (Config, error) {
 	// Override default with environment variables
 	viper.SetEnvPrefix("GONVEY")
 	viper.AutomaticEnv()
-	viper.Unmarshal(&config)
+	err := viper.Unmarshal(&config)
+	if err != nil {
+		return config, err
+	}
 
 	config.LogLevel = viper.GetString("log_level")
 	config.ServerPort = uint(viper.GetInt("server_port"))
 	config.ProxyMap = viper.GetStringMapStringSlice("proxy_map")
 
 	validate := v.New()
-	err := validate.Struct(config)
+	err = validate.Struct(config)
 	if err != nil {
 		return config, err
 	}
