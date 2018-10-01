@@ -50,8 +50,8 @@ func init() {
 }
 
 // Send metrics to Prometheus
-func pushMetrics(log *zerolog.Logger, start time.Time, request *http.Request, response *http.Response) {
-	httpRequestsResponseTime.Observe(float64(time.Since(start).Nanoseconds()))
+func pushMetrics(log *zerolog.Logger, elapsed time.Duration, request *http.Request, response *http.Response) {
+	httpRequestsResponseTime.Observe(float64(elapsed))
 
 	httpRequestsCount.With(prometheus.Labels{
 		"http_method":      request.Method,

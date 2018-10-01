@@ -39,7 +39,7 @@ func (g *Gonveyor) RoundTrip(request *http.Request) (*http.Response, error) {
 		Int("http_response_code", response.StatusCode).
 		Msg("request proxied")
 
-	pushMetrics(g.log, start, request, response)
+	pushMetrics(g.log, elapsed, request, response)
 
 	return response, nil
 }

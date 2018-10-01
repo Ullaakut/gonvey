@@ -97,9 +97,9 @@ func loadBalance(proxies []*httputil.ReverseProxy) *httputil.ReverseProxy {
 // eg: an endpoint is bound to `/bloggo`, and a request for `/bloggo/posts` comes up, the
 // request will be forwarded to the endpoint with `/posts` as its request URI
 func splitPath(requestURI string, proxyMap map[string][]*httputil.ReverseProxy) (string, string, error) {
-	for endpoint := range proxyMap {
-		if strings.HasPrefix(requestURI, endpoint) {
-			return endpoint, strings.Replace(requestURI, endpoint, "", 1), nil
+	for path := range proxyMap {
+		if strings.HasPrefix(requestURI, path) {
+			return path, strings.Replace(requestURI, path, "", 1), nil
 		}
 	}
 	return "", "", fmt.Errorf("path %s is not bound to any endpoints", requestURI)
