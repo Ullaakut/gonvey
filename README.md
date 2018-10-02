@@ -21,6 +21,9 @@ See the [part on proxy map configuration](#gonvey_proxy_map) for more informatio
     <a href="https://travis-ci.org/Ullaakut/gonvey">
         <img src="https://travis-ci.org/Ullaakut/gonvey.svg?branch=master" />
     </a>
+    <a href="https://golangci.com/r/github.com/Ullaakut/gonvey">
+        <img src="https://golangci.com/badges/github.com/Ullaakut/gonvey.svg" />
+    </a>
 </p>
 
 ## Table of content
